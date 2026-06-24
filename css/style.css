@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SYSTEM CORE TOKENS & RESET
+   SYSTEM CORE SPECIFICATION DESIGN TOKENS
    ========================================================================== */
 :root {
     --bg-primary: #FFFFFF;
@@ -8,18 +8,22 @@
     --text-primary: #111111;
     --text-muted: #8E8E93;
     --accent-black: #000000;
+    
     --danger-red: #FF3B30;
     --danger-bg: #FFECEB;
+    
     --layer-ui: 100;
     --layer-panel: 500;
-    --layer-floating: 1000;
+    --layer-universal-overlay: 99999; /* Absolute elevation configuration to guarantee zero blockage */
+    --layer-floating: 100000;
+    
     --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
     overflow: hidden;
@@ -29,18 +33,18 @@ body {
 }
 
 /* ==========================================================================
-   TOP STICKY NAVIGATION BAR
+   PERSISTENT COMPONENT STYLES: NAVIGATION CONTROLS
    ========================================================================== */
 .top-nav {
     position: fixed; top: 0; left: 0; width: 100%; height: 60px;
     display: flex; justify-content: space-between; align-items: center; padding: 0 40px;
     border-bottom: 1px solid var(--border-color); background-color: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px); z-index: var(--layer-ui);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: var(--layer-ui);
 }
 
 .brand-wrapper { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
-.atom-logo { color: var(--accent-black); animation: clean-spin 30s linear infinite; }
-@keyframes clean-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.atom-logo { color: var(--accent-black); animation: clean-helix-spin 24s linear infinite; }
+@keyframes clean-helix-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .logo { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
 
 .nav-right { position: relative; display: flex; align-items: center; }
@@ -50,7 +54,7 @@ body {
 }
 .icon-btn:hover { background-color: var(--bg-secondary); }
 
-/* Hamburger Dropdown Structural Sheet */
+/* Settings Hamburger Menu Window */
 .hamburger-dropdown {
     position: absolute; top: 46px; right: 0; width: 240px;
     background: var(--bg-primary); border: 1px solid var(--border-color);
@@ -66,10 +70,10 @@ body {
 .hamburger-item:hover { background-color: var(--bg-secondary); }
 
 /* ==========================================================================
-   ALIGNED UNIVERSAL CONTAINER SYSTEM (TOP RIGHT, SEPARATED FROM NAV)
+   ALIGNED UNIVERSAL CONTAINER SYSTEM (HIGH Z-INDEX OVERLAP EXCLUSIVITY)
    ========================================================================== */
 .top-right-alignment {
-    position: fixed; top: 76px; right: 40px; z-index: var(--layer-ui);
+    position: fixed; top: 76px; right: 40px; z-index: var(--layer-universal-overlay);
     display: flex; flex-direction: column; align-items: flex-end;
 }
 .universal-btn {
@@ -82,79 +86,81 @@ body {
 .universal-container {
     margin-top: 14px; width: 340px; height: 440px; background: var(--bg-primary);
     border: 1px solid var(--border-color); border-radius: 16px;
-    box-shadow: 0 16px 48px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.16); display: flex; flex-direction: column; overflow: hidden;
 }
 .universal-container.hidden { display: none; }
+
 .drawer-header {
     padding: 16px 20px; border-bottom: 1px solid var(--border-color);
-    display: flex; justify-content: space-between; align-items: center;
+    display: flex; align-items: center; gap: 16px; justify-content: flex-start;
 }
-.drawer-header h3 { font-size: 14px; font-weight: 600; }
+.drawer-header h3 { font-size: 14px; font-weight: 600; margin-left: auto; padding-right: 12px; }
 .scrollable-card-vault { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
 /* ==========================================================================
-   HOMEPAGE METRICS & TURQUOISE AMBIENT SKY CANVAS
+   HOMEPAGE VIEWPORTS & PACIFIC GRADIENT ENVIRONMENT
    ========================================================================== */
 #app-viewport { position: relative; width: 100%; height: 100%; padding-top: 60px; }
 .app-state {
     position: absolute; top: 60px; left: 0; width: 100%; height: calc(100% - 60px);
     opacity: 0; visibility: hidden; pointer-events: none;
     transition: opacity 0.4s var(--transition-smooth), transform 0.4s var(--transition-smooth);
-    transform: translateY(10px);
+    transform: translateY(12px);
 }
 .app-state.active { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
 
 #state-home { display: flex; flex-direction: column; align-items: center; padding: 80px 40px; overflow-y: auto; }
 
-/* Premium Tech-Savvy Flowing Color Sky Canvas */
+/* Advanced Liquid Tech Ocean Sky Backdrop Layout */
 .vancouver-tech-sky {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-    background-size: 400% 400%; animation: fluidSky 25s ease infinite; z-index: -1;
+    background: linear-gradient(135deg, #001A30 0%, #00334E 30%, #005B7F 65%, #0088A8 100%);
+    background-size: 400% 400%; animation: rollingWaveEngine 18s ease infinite; z-index: -1;
 }
-@keyframes fluidSky {
+@keyframes rollingWaveEngine {
     0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
 }
 
-/* Apple Liquid Frosted Typography Frame */
+/* Glass Typography Metric Rules */
 .liquid-glass-text {
-    font-size: 116px; font-weight: 100; letter-spacing: -4px; line-height: 1; margin-bottom: 14px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.4) 100%);
+    font-size: 116px; font-weight: 100; letter-spacing: -4px; line-height: 1; margin-bottom: 16px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.3) 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 4px 20px rgba(0,0,0,0.15));
+    filter: drop-shadow(0 4px 24px rgba(0,0,0,0.2));
 }
 .hero-clock-section { text-align: center; margin-bottom: 60px; }
-.hero-meta { font-size: 15px; color: rgba(255,255,255,0.7); font-weight: 500; letter-spacing: -0.1px; }
-.meta-divider { margin: 0 10px; color: rgba(255,255,255,0.4); }
+.hero-meta { font-size: 15px; color: rgba(255,255,255,0.75); font-weight: 500; letter-spacing: -0.1px; }
+.meta-divider { margin: 0 10px; color: rgba(255,255,255,0.3); }
 
 .home-grid { display: grid; grid-template-columns: repeat(2, 450px); gap: 40px; justify-content: center; width: 100%; }
-.dashboard-card-panel { background: rgba(255,255,255,0.08); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 24px; min-height: 300px; color: #FFFFFF; }
+.dashboard-card-panel { background: rgba(255,255,255,0.07); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 24px; min-height: 300px; color: #FFFFFF; }
 .dashboard-card-panel h2 { font-size: 16px; font-weight: 600; color: #FFFFFF; }
 .panel-badge { font-size: 11px; background: rgba(255,255,255,0.2); color: #FFF; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
 .card-feed-list { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
 
 /* ==========================================================================
-   FAR RIGHT EXTENSION NAVIGATION HUB (LEFTWARD SLIDE VERTICAL PACK)
+   FAR RIGHT WORKSPACE SWITCHER DOCK
    ========================================================================== */
 .edge-right-centered {
     position: fixed; right: 24px; top: 50%; transform: translateY(-50%);
-    z-index: var(--layer-floating); display: flex; align-items: center; gap: 16px;
+    z-index: var(--layer-floating); display: flex; align-items: center; gap: 14px;
 }
 .triangle-btn { background: none; border: none; cursor: pointer; width: 24px; height: 32px; display: flex; align-items: center; justify-content: center; }
+
 .triangle-icon {
-    width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent;
-    border-right: 12px solid var(--text-muted); transition: transform 0.4s var(--transition-smooth), border-right-color 0.2s;
+    width: 0; height: 0; border-top: 7px solid transparent; border-bottom: 7px solid transparent;
+    border-right: 11px solid var(--text-muted); border-radius: 2px;
+    transition: transform 0.4s var(--transition-smooth), border-right-color 0.2s;
 }
 .triangle-btn:hover .triangle-icon { border-right-color: var(--accent-black); }
-.triangle-btn.active .triangle-icon { transform: rotate(180deg); } /* Rotates outward right */
+.triangle-btn.active .triangle-icon { transform: rotate(180deg); }
 
-/* Vertical Alignment Menu Sliding Out to the Left of the Triangle Trigger */
 .pill-menu {
-    display: flex; flex-direction: column; gap: 8px; background-color: var(--bg-primary); padding: 8px;
-    border-radius: 20px; border: 1px solid var(--border-color); box-shadow: 0 12px 40px rgba(0,0,0,0.06);
-    align-items: center; transition: opacity 0.3s var(--transition-smooth), transform 0.3s var(--transition-smooth);
+    display: flex; flex-direction: column; gap: 6px; background-color: var(--bg-primary); padding: 8px;
+    border-radius: 20px; border: 1px solid var(--border-color); box-shadow: 0 12px 42px rgba(0,0,0,0.06);
+    align-items: center; transition: opacity 0.35s var(--transition-smooth), transform 0.35s var(--transition-smooth);
 }
-.pill-menu.hidden { opacity: 0; transform: translateX(15px); pointer-events: none; }
+.pill-menu.hidden { opacity: 0; transform: translateX(20px); pointer-events: none; }
 
 .tool-pill {
     background: none; border: none; padding: 8px 16px; font-size: 13px; font-weight: 600;
@@ -162,7 +168,6 @@ body {
 }
 .tool-pill:hover, .tool-pill.active { background-color: var(--bg-secondary); color: var(--accent-black); }
 
-/* Unified Center-Menu Structural House Icon Control */
 .tool-house-btn {
     background: none; border: none; width: 36px; height: 36px; display: flex; align-items: center;
     justify-content: center; color: var(--text-muted); cursor: pointer; border-radius: 12px; transition: all 0.2s;
@@ -170,9 +175,12 @@ body {
 .tool-house-btn:hover, .tool-house-btn.active { color: var(--accent-black); background-color: var(--bg-secondary); }
 
 /* ==========================================================================
-   DYNAMIC UNIVERSAL CARD OBJECT LAYER & INTERFACE ENGINES
+   DYNAMIC INTERACTIVE CAPTURE CARD CORE INTERFACES
    ========================================================================== */
-.tool-header { display: flex; justify-content: space-between; align-items: center; padding: 40px 60px; border-bottom: 1px solid var(--border-color); }
+.tool-header {
+    display: flex; justify-content: flex-start; align-items: center; 
+    padding: 40px 60px; border-bottom: 1px solid var(--border-color); gap: 24px;
+}
 .tool-header h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
 
 .create-card-btn {
@@ -182,9 +190,8 @@ body {
 }
 .create-card-btn:hover { transform: scale(1.08); }
 
-.tool-canvas { padding: 40px 60px; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+.tool-canvas { padding: 40px 60px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; }
 
-/* Functional Interactive Workspace Card UI */
 .universal-card-widget {
     background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 14px;
     padding: 16px; display: flex; flex-direction: column; gap: 12px; position: relative;
@@ -194,10 +201,10 @@ body {
 
 .card-editable-area {
     width: 100%; border: none; outline: none; resize: none; font-size: 14px;
-    font-family: inherit; color: var(--text-primary); line-height: 1.4; background: transparent;
+    font-family: inherit; color: var(--text-primary); line-height: 1.4; background: transparent; min-height: 60px;
 }
 
-/* Boardly Multi-State Hue Indicators */
+/* Boardly Metric State Left Accent-Border Conversions */
 .universal-card-widget.type-goal { border-left: 4px solid #FF9500; }
 .universal-card-widget.type-note { border-left: 4px solid #007AFF; }
 .universal-card-widget.type-task { border-left: 4px solid #34C759; }
@@ -205,18 +212,19 @@ body {
 .card-control-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
 .card-cycle-btn {
     background: var(--bg-secondary); border: 1px solid var(--border-color); font-size: 11px;
-    font-weight: 600; padding: 4px 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px;
+    font-weight: 600; padding: 4px 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px; color: var(--text-primary);
 }
 
 /* ==========================================================================
-   VOICE COGNITIVE RIG & DANGER-RED HIGH TRASH
+   VOICE INTERACTION CORE MODULE & HIGH-SIGNALING TRASH TERMINAL
    ========================================================================== */
 .draggable-voice-widget { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: var(--layer-floating); display: flex; flex-direction: column; align-items: center; }
 .voice-bubble-trigger {
     width: 56px; height: 56px; border-radius: 50%; background-color: var(--accent-black);
     border: none; cursor: grab; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
-.voice-atom-logo { width: 24px; height: 24px; animation: clean-spin 40s linear infinite; }
+.voice-atom-logo { width: 24px; height: 24px; animation: clean-helix-spin 32s linear infinite; }
+
 .chat-panel { position: absolute; bottom: 72px; width: 380px; height: 480px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 16px 48px rgba(0,0,0,0.12); display: flex; flex-direction: column; overflow: hidden; }
 .chat-panel.hidden { display: none; }
 .chat-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; }
@@ -227,7 +235,7 @@ body {
 .mode-action-btn { background: none; border: none; font-size: 16px; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 .mode-action-btn:hover { background-color: var(--bg-secondary); }
 
-/* High-Signaling Danger Red Expansion Zone */
+/* High-Signaling Red Deletion Target */
 .trash-zone {
     position: fixed; bottom: 40px; right: 40px; width: 58px; height: 58px; border-radius: 50%;
     border: 2px dashed var(--danger-red); background-color: rgba(255,59,48,0.02);
@@ -237,11 +245,11 @@ body {
 .trash-zone:hover { transform: scale(1.15); background-color: var(--danger-bg); box-shadow: 0 8px 24px rgba(255,59,48,0.12); }
 .trash-zone.drag-over { background-color: var(--danger-red); color: #FFFFFF; border-style: solid; transform: scale(1.22); }
 
-/* LOCAL DEVICE DEVICE HANDSHAKE MODAL */
+/* SECURITY MODAL */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: var(--layer-floating); }
 .modal-overlay.hidden { display: none; }
 .modal-sheet { background: var(--bg-primary); padding: 30px; border-radius: 16px; max-width: 400px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.15); }
 .modal-sheet h3 { margin-bottom: 12px; font-size: 18px; }
 .modal-sheet p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
-.modal-sheet input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: monospace; font-size: 15px; text-align: center; margin-bottom: 20px; background: var(--bg-secondary); }
-.modal-close-btn { background: var(--accent-black); color: #FFF; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; }
+.modal-sheet input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; margin-bottom: 12px; background: var(--bg-secondary); outline: none; }
+.modal-close-btn { background: var(--accent-black); color: #FFF; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; }
