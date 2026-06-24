@@ -1,0 +1,511 @@
+/* ==========================================================================
+   1. SYSTEM DESIGN TOKENS & RESET
+   ========================================================================== */
+:root {
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #FAFAFA;
+    --border-color: #EAEAEA;
+    --text-primary: #111111;
+    --text-muted: #717171;
+    --accent-black: #000000;
+    --accent-pill-hover: #F5F5F7;
+    
+    /* System Depth Levels */
+    --layer-base: 1;
+    --layer-ui: 100;
+    --layer-panel: 500;
+    --layer-floating: 1000;
+    
+    --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    overflow: hidden; /* Lock viewport scrolling to behave like a native application */
+    width: 100vw;
+    height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   2. TOP NAVIGATION SHELL
+   ========================================================================== */
+.top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    z-index: var(--layer-ui);
+}
+
+.logo {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.icon-btn:hover {
+    background-color: var(--bg-secondary);
+}
+
+/* ==========================================================================
+   3. APP VIEWPORT & APPLICATION STATES
+   ========================================================================== */
+#app-viewport {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding-top: 60px;
+}
+
+.app-state {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 60px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s var(--transition-smooth), transform 0.3s var(--transition-smooth);
+    transform: translateY(8px);
+}
+
+.app-state.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   4. HOME STATE LAYOUT (BROWSER COMPONENT FOYER)
+   ========================================================================== */
+#state-home {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 80px 40px 40px 40px;
+    overflow-y: auto;
+}
+
+.hero-clock-section {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+#digital-clock {
+    font-size: 96px;
+    font-weight: 200;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 12px;
+}
+
+.hero-meta {
+    font-size: 15px;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.meta-divider {
+    margin: 0 8px;
+}
+
+.home-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 440px);
+    gap: 40px;
+    justify-content: center;
+    width: 100%;
+}
+
+.dashboard-card-panel {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 24px;
+    min-height: 280px;
+    transition: transform 0.4s var(--transition-smooth), box-shadow 0.4s var(--transition-smooth);
+}
+
+/* Apple Folder Scale Expansion Class triggered by JS */
+.dashboard-card-panel.expanded-folder-zoom {
+    position: fixed;
+    top: 10%;
+    left: 10%;
+    width: 80%;
+    height: 80%;
+    z-index: var(--layer-panel);
+    transform: scale(1.05);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+    background-color: var(--bg-primary);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.panel-header h2 {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.panel-badge {
+    font-size: 12px;
+    background-color: var(--accent-black);
+    color: #FFFFFF;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.card-feed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ==========================================================================
+   5. NAVIGATION HUB (DIRECTIONAL TRIANGLE MENU)
+   ========================================================================== */
+#navigation-hub {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--layer-floating);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.triangle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 32px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Smooth Curved Inward-Pointing Triangle CSS Shape */
+.triangle-icon {
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 12px solid var(--accent-black);
+    border-radius: 4px;
+    transition: transform 0.4s var(--transition-smooth);
+    transform: rotate(0deg); /* Latent state pointing up/inward */
+}
+
+.triangle-btn.active .triangle-icon {
+    transform: rotate(180deg); /* Active state pointing down/outward */
+}
+
+.pill-menu {
+    position: absolute;
+    top: 36px;
+    display: flex;
+    gap: 6px;
+    background-color: var(--bg-primary);
+    padding: 6px;
+    border-radius: 30px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s var(--transition-smooth), transform 0.3s var(--transition-smooth);
+}
+
+.pill-menu.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+.tool-pill {
+    background: none;
+    border: none;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 20px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+}
+
+.tool-pill:hover {
+    background-color: var(--accent-pill-hover);
+    color: var(--text-primary);
+}
+
+.tool-pill.active {
+    background-color: var(--accent-black);
+    color: #FFFFFF;
+}
+
+/* ==========================================================================
+   6. UNIVERSAL BOARD CONTROL
+   ========================================================================== */
+#universal-board-zone {
+    position: fixed;
+    top: 12px;
+    left: 40px;
+    z-index: var(--layer-floating);
+}
+
+.universal-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--accent-black);
+    transition: transform 0.2s ease;
+}
+
+.universal-btn:hover {
+    transform: scale(1.05);
+}
+
+.universal-container {
+    position: absolute;
+    top: 48px;
+    left: 0;
+    width: 320px;
+    height: 420px; /* Fixed proportional dimensions by design */
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: opacity 0.2s ease, transform 0.2s var(--transition-smooth);
+}
+
+.universal-container.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+.drawer-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.drawer-header h3 {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.scrollable-card-vault {
+    flex-1: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ==========================================================================
+   7. COGNITIVE INTERFACE (DRAGGABLE VOICE CORE)
+   ========================================================================== */
+#voice-cognitive-shell {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--layer-floating);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.voice-bubble-trigger {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--accent-black);
+    border: none;
+    cursor: grab;
+    position: relative;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.voice-bubble-trigger:active {
+    cursor: grabbing;
+}
+
+.chat-panel {
+    position: absolute;
+    bottom: 72px;
+    width: 380px;
+    height: 480px;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: opacity 0.2s ease, transform 0.2s var(--transition-smooth);
+}
+
+.chat-panel.hidden {
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+}
+
+.chat-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.text-link-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.text-link-btn:hover {
+    color: var(--text-primary);
+}
+
+.chat-log {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.chat-input-bar {
+    padding: 16px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#assistant-raw-input {
+    flex: 1;
+    border: 1px solid var(--border-color);
+    padding: 10px 14px;
+    border-radius: 20px;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+#assistant-raw-input:focus {
+    border-color: var(--text-primary);
+}
+
+.mode-action-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.mode-action-btn:hover {
+    background-color: var(--bg-secondary);
+}
+
+/* Ambient Audio Wave Simulation Style */
+.wave-container {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 12px;
+}
+
+.wave-bar {
+    width: 3px;
+    height: 15px;
+    background-color: var(--accent-black);
+    animation: bounce 0.8s ease-in-out infinite alternate;
+}
+@keyframes bounce { 
+    0% { transform: scaleY(0.3); } 
+    100% { transform: scaleY(1.3); } 
+}
+
+/* ==========================================================================
+   8. GLOBAL TRASH DESTRUCTION ZONE
+   ========================================================================== */
+.trash-zone {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 1px dashed var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    z-index: var(--layer-ui);
+}
+
+.trash-zone.drag-over {
+    background-color: #FFF5F5;
+    border-color: #FF4D4F;
+    color: #FF4D4F;
+    transform: scale(1.1);
+}
