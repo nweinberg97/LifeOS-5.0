@@ -4,706 +4,125 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LifeOS</title>
-    <style>
-        /* --- CSS VARIABLES & THEME SYSTEM --- */
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9f9f9;
-            --bg-tertiary: #f1f1f1;
-            --border-color: #e5e5e5;
-            --text-primary: #111111;
-            --text-secondary: #666666;
-            --text-muted: #999999;
-            --accent-color: #000000;
-            --accent-radius: 6px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            --transition-speed: 0.2s;
-        }
-
-        /* --- GLOBAL RESET --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
-
-        body, html {
-            width: 100%;
-            height: 100%;
-            font-family: var(--font-stack);
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            overflow: hidden;
-        }
-
-        input, textarea, button {
-            font-family: inherit;
-            font-size: inherit;
-            color: inherit;
-        }
-
-        /* --- LAYOUT WRAPPER STRUCTURAL MATRIX --- */
-        #app-container {
-            display: grid;
-            grid-template-rows: 60px 1fr 60px;
-            grid-template-columns: 1fr;
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-        }
-
-        /* --- 1. TOP NAVIGATION BAR --- */
-        header {
-            grid-row: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 24px;
-            border-bottom: 1px solid var(--border-color);
-            background: var(--bg-primary);
-            z-index: 100;
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-            font-size: 1.1rem;
-        }
-
-        .logo-icon {
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--accent-color);
-            border-radius: 50%;
-            display: inline-block;
-            position: relative;
-        }
-        .logo-icon::after {
-            content: '';
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: var(--accent-color);
-            border-radius: 50%;
-            top: 4px;
-            left: 4px;
-        }
-
-        .top-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: var(--accent-radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background var(--transition-speed);
-        }
-
-        .nav-btn:hover {
-            background: var(--bg-secondary);
-        }
-
-        /* --- 2. ACTIVE TOOL WORKSPACE --- */
-        main {
-            grid-row: 2;
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-primary);
-            overflow: hidden;
-        }
-
-        .view-panel {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            padding: 32px;
-            overflow-y: auto;
-        }
-
-        .view-panel.active {
-            display: block;
-        }
-
-        /* --- 3. PERSISTENT FOOTER CONTROLS --- */
-        footer {
-            grid-row: 3;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 24px;
-            border-top: 1px solid var(--border-color);
-            background: var(--bg-primary);
-            z-index: 100;
-        }
-
-        /* --- 4. THE UNIVERSAL BOARD SIDE-DRAWER --- */
-        #universal-drawer {
-            position: fixed;
-            top: 0;
-            right: -360px;
-            width: 360px;
-            height: 100%;
-            background: var(--bg-primary);
-            border-left: 1px solid var(--border-color);
-            box-shadow: var(--shadow-md);
-            z-index: 200;
-            transition: right var(--transition-speed) cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            flex-direction: column;
-        }
-
-        #universal-drawer.open {
-            right: 0;
-        }
-
-        .drawer-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .drawer-content {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        /* --- 5. SLIDING RIGHT-VERTICAL TOOL SELECTOR --- */
-        #tool-selector-trigger {
-            position: fixed;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-right: none;
-            padding: 12px 6px;
-            border-radius: 8px 0 0 8px;
-            cursor: pointer;
-            z-index: 150;
-            box-shadow: var(--shadow-sm);
-        }
-
-        #tool-menu-panel {
-            position: fixed;
-            right: -80px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px 0 0 12px;
-            padding: 16px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            box-shadow: var(--shadow-md);
-            z-index: 149;
-            transition: right var(--transition-speed) cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        #tool-menu-panel.visible {
-            right: 0;
-        }
-
-        .tool-circle {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 1px solid var(--border-color);
-            background: var(--bg-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all var(--transition-speed);
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .tool-circle:hover, .tool-circle.active {
-            background: var(--accent-color);
-            color: var(--bg-primary);
-            border-color: var(--accent-color);
-        }
-
-        /* --- 6. VOICE BRAIN FLOATING ATOM --- */
-        #voice-atom-container {
-            position: absolute;
-            bottom: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 110;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        #voice-atom {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: var(--accent-color);
-            color: var(--bg-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: grab;
-            box-shadow: var(--shadow-md);
-            position: relative;
-        }
-
-        #voice-atom:active {
-            cursor: grabbing;
-        }
-
-        .atom-core {
-            width: 14px;
-            height: 14px;
-            background: var(--bg-primary);
-            border-radius: 50%;
-            position: relative;
-            animation: pulse 3s infinite ease-in-out;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.7; }
-        }
-
-        #voice-dock {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 6px;
-            display: none;
-            gap: 8px;
-            box-shadow: var(--shadow-md);
-        }
-
-        #voice-dock.open {
-            display: flex;
-        }
-
-        .dock-mode-btn {
-            background: none;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 16px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background var(--transition-speed);
-        }
-
-        .dock-mode-btn:hover, .dock-mode-btn.active {
-            background: var(--bg-tertiary);
-        }
-
-        /* --- 7. PERSISTENT GLOBAL TRASH ZONE --- */
-        #trash-zone {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            padding: 8px 12px;
-            border-radius: var(--accent-radius);
-            border: 1px dashed transparent;
-            transition: all var(--transition-speed);
-        }
-
-        #trash-zone.drag-over {
-            background: #fff5f5;
-            border-color: #ff8787;
-            color: #e03131;
-        }
-
-        /* --- 8. GLOBAL SETTINGS MODAL DIALOG --- */
-        #settings-panel {
-            position: fixed;
-            top: 0;
-            left: -400px;
-            width: 400px;
-            height: 100%;
-            background: var(--bg-primary);
-            border-right: 1px solid var(--border-color);
-            box-shadow: var(--shadow-md);
-            z-index: 200;
-            transition: left var(--transition-speed) cubic-bezier(0.16, 1, 0.3, 1);
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        #settings-panel.open {
-            left: 0;
-        }
-
-        .settings-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
-        }
-
-        .json-box {
-            width: 100%;
-            height: 150px;
-            font-family: monospace;
-            font-size: 0.75rem;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--accent-radius);
-            background: var(--bg-secondary);
-            resize: none;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .primary-btn {
-            background: var(--accent-color);
-            color: var(--bg-primary);
-            border: none;
-            padding: 8px 16px;
-            border-radius: var(--accent-radius);
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        /* --- GENERIC UTILITIES & OBJECT CARDS --- */
-        .universal-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--accent-radius);
-            padding: 12px;
-            box-shadow: var(--shadow-sm);
-            cursor: grab;
-        }
-        
-        .placeholder-view {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: var(--text-muted);
-            gap: 8px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <div id="app-container">
+    <nav class="top-nav">
+        <div class="logo">LifeOS</div>
+        <div class="nav-right">
+            <button id="settings-trigger" class="icon-btn" aria-label="Settings">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <main id="app-viewport">
         
-        <header>
-            <div class="logo-area" id="nav-logo">
-                <span class="logo-icon"></span>
-                <span>LifeOS</span>
-            </div>
-            <div class="top-actions">
-                <button class="nav-btn" id="universal-board-toggle" title="Universal Board">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="9"></circle>
-                        <line x1="3.6" y1="20.4" x2="20.4" y2="3.6"></line>
-                    </svg>
-                </button>
-                <button class="nav-btn" id="settings-toggle" title="Settings">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <line x1="3" y1="18" x2="21" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-        </header>
-
-        <main id="active-workspace">
-            
-            <div id="view-home" class="view-panel active">
-                <div class="placeholder-view">
-                    <h2>Welcome to LifeOS</h2>
-                    <p>Your production system dashboard layout engine is ready.</p>
+        <section id="state-home" class="app-state active">
+            <div class="hero-clock-section">
+                <h1 id="digital-clock">00:00</h1>
+                <div class="hero-meta">
+                    <span id="current-date">Loading date...</span>
+                    <span class="meta-divider">•</span>
+                    <span id="weather-display">--°C</span>
                 </div>
             </div>
 
-            <div id="view-taskly" class="view-panel">
-                <div class="placeholder-view">
-                    <h2>Taskly Modules</h2>
-                    <p>5-Column Pipeline Frame Enabled.</p>
+            <div class="home-grid">
+                <div id="next-up-container" class="dashboard-card-panel">
+                    <div class="panel-header">
+                        <h2>Next Up</h2>
+                        <span class="panel-badge">3 Priorities</span>
+                    </div>
+                    <div id="next-up-list" class="card-feed-list">
+                        </div>
+                </div>
+
+                <div id="recent-updates-container" class="dashboard-card-panel">
+                    <div class="panel-header">
+                        <h2>Recent Activity</h2>
+                    </div>
+                    <div id="recent-updates-list" class="card-feed-list">
+                        </div>
                 </div>
             </div>
+        </section>
 
-            <div id="view-boardly" class="view-panel">
-                <div class="placeholder-view">
-                    <h2>Boardly Coordinate Engine</h2>
-                    <p>Spatial 2D Matrix Grid Canvas Enabled.</p>
-                </div>
-            </div>
+        <section id="state-taskly" class="app-state">
+            <div class="tool-header"><h2>Taskly</h2></div>
+            </section>
 
-            <div id="view-timely" class="view-panel">
-                <div class="placeholder-view">
-                    <h2>Timely Client Sync</h2>
-                    <p>Structured Temporal Horizon Generator Enabled.</p>
-                </div>
-            </div>
+        <section id="state-boardly" class="app-state">
+            <div class="tool-header"><h2>Boardly</h2></div>
+        </section>
 
-            <div id="view-brainly" class="view-panel">
-                <div class="placeholder-view">
-                    <h2>Brainly Knowledge Mesh</h2>
-                    <p>Infinite Unbounded Spatial Sandbox Node Mapping Enabled.</p>
-                </div>
-            </div>
+        <section id="state-timely" class="app-state">
+            <div class="tool-header"><h2>Timely</h2></div>
+        </section>
 
-        </main>
+        <section id="state-brainly" class="app-state">
+            <div class="tool-header"><h2>Brainly</h2></div>
+        </section>
+    </main>
 
-        <footer>
-            <div></div>
-            
-            <div id="voice-atom-container">
-                <div id="voice-dock">
-                    <button class="dock-mode-btn active" data-mode="voice">Voice</button>
-                    <button class="dock-mode-btn" data-mode="chat">Chat</button>
-                    <button class="dock-mode-btn" data-mode="cmd">Command</button>
-                </div>
-                <div id="voice-atom" draggable="true">
-                    <div class="atom-core"></div>
-                </div>
-            </div>
-
-            <div id="trash-zone">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                </svg>
-                <span style="font-size: 0.85rem; font-weight: 500;">Drop to Purge</span>
-            </div>
-        </footer>
-
-        <div id="universal-drawer">
-            <div class="drawer-header">
-                <h3 style="font-weight: 600; font-size: 1rem;">Universal Board</h3>
-                <button class="nav-btn" id="drawer-close">✕</button>
-            </div>
-            <div class="drawer-content" id="universal-card-stack">
-                </div>
+    <div id="navigation-hub">
+        <button id="triangle-toggle-btn" class="triangle-btn" aria-label="Toggle Navigator">
+            <span class="triangle-icon"></span>
+        </button>
+        <div id="tool-pill-menu" class="pill-menu hidden">
+            <button class="tool-pill active" data-target="home">Home</button>
+            <button class="tool-pill" data-target="taskly">Taskly</button>
+            <button class="tool-pill" data-target="boardly">Boardly</button>
+            <button class="tool-pill" data-target="timely">Timely</button>
+            <button class="tool-pill" data-target="brainly">Brainly</button>
         </div>
-
-        <div id="tool-selector-trigger">◀</div>
-        <div id="tool-menu-panel">
-            <div class="tool-circle active" data-target="home" title="Home View">H</div>
-            <div class="tool-circle" data-target="taskly" title="Taskly">T</div>
-            <div class="tool-circle" data-target="boardly" title="Boardly">B</div>
-            <div class="tool-circle" data-target="timely" title="Timely">T+</div>
-            <div class="tool-circle" data-target="brainly" title="Brainly">BΩ</div>
-        </div>
-
-        <div id="settings-panel">
-            <div class="settings-header">
-                <h3 style="font-weight: 600;">System Controls & Sandbox State</h3>
-                <button class="nav-btn" id="settings-close">✕</button>
-            </div>
-            <div>
-                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px;">Raw Normalized Storage String Engine Backup:</p>
-                <textarea class="json-box" id="state-json-io" readonly></textarea>
-            </div>
-            <div class="btn-group">
-                <button class="primary-btn" id="btn-export-state" style="font-size: 0.8rem;">Copy Payload</button>
-                <button class="nav-btn" id="btn-clear-cache" style="font-size: 0.8rem; border: 1px solid var(--border-color); color: #e03131;">Purge Sandbox</button>
-            </div>
-            <hr style="border: 0; border-top: 1px solid var(--border-color);">
-            <div style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.4;">
-                <p><strong>Local-First System Profile Validation:</strong> All state attributes persist natively in your sandbox client context database. No external tracking configurations can read this layer.</p>
-            </div>
-        </div>
-
     </div>
 
-    <script>
-        (function() {
-            'use strict';
+    <div id="universal-board-zone">
+        <button id="universal-board-btn" class="universal-btn" aria-label="Universal Board">
+            <svg class="universe-icon" viewBox="0 0 24 24" width="24" height="24">
+                <circle cx="12" cy="12" r="10" fill="currentColor"/>
+                <circle cx="12" cy="12" r="6" fill="#FFF"/>
+                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+            </svg>
+        </button>
+        <div id="universal-board-drawer" class="universal-container hidden">
+            <div class="drawer-header">
+                <h3>Universal Board</h3>
+            </div>
+            <div id="universal-card-scroller" class="scrollable-card-vault">
+                </div>
+        </div>
+    </div>
 
-            const STORAGE_KEY = 'lifeos_master_state';
+    <div id="voice-cognitive-shell" class="draggable-voice-widget">
+        <button id="voice-anchor-btn" class="voice-bubble-trigger">
+            <div class="pulse-ring"></div>
+        </button>
+        
+        <div id="chat-interface-panel" class="chat-panel hidden">
+            <div class="chat-header">
+                <span>LifeOS Assistant</span>
+                <button id="minimize-chat" class="text-link-btn">Minimize</button>
+            </div>
+            <div id="chat-history-stream" class="chat-log">
+                </div>
+            <div class="chat-input-bar">
+                <button id="voice-mode-toggle" class="mode-action-btn" title="Toggle Voice Mode">🎤</button>
+                <input type="text" id="assistant-raw-input" placeholder="Ask, command, or capture...">
+                <button id="command-mode-toggle" class="mode-action-btn" title="Toggle Execution Mode">⚡</button>
+            </div>
+            <div id="audio-wave-feedback" class="wave-container hidden">
+                <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            </div>
+        </div>
+    </div>
 
-            // --- LOCAL STORAGE SCHEMA SCHEMA MODEL INFRASTRUCTURE ---
-            const DEFAULT_STATE = {
-                universal_board: [],
-                taskly: { todo: [], in_progress: [], review: [], completed: [], backlog: [] },
-                boardly: {
-                    active_tab: "tab-1",
-                    tabs: [{ id: "tab-1", title: "Health", color_dot: "#FF5733" }],
-                    cards: []
-                },
-                timely: {
-                    scheduling: { daily: [], weekly: [], monthly: [], reminders: [] },
-                    planning: { goals: [], projects: [] }
-                },
-                brainly: { notes: [], remote_shelf: [] }
-            };
+    <div id="global-trash-dropzone" class="trash-zone">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+    </div>
 
-            let state = {};
-
-            // --- INSTANT PERSISTENCE CONTEXT MANAGERS ---
-            function initEngineState() {
-                try {
-                    const saved = localStorage.getItem(STORAGE_KEY);
-                    if (saved) {
-                        state = JSON.parse(saved);
-                    } else {
-                        state = JSON.parse(JSON.stringify(DEFAULT_STATE));
-                        saveEngineState();
-                    }
-                } catch (e) {
-                    console.error("Critical State Extraction Core Initialization Engine Error:", e);
-                    state = JSON.parse(JSON.stringify(DEFAULT_STATE));
-                }
-            }
-
-            function saveEngineState() {
-                try {
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-                    document.getElementById('state-json-io').value = JSON.stringify(state, null, 2);
-                } catch(e) {
-                    alert("Data Loss Mitigation Protocol Triggered: Local storage execution buffer limit encountered.");
-                }
-            }
-
-            // --- APPLICATION VIEW AND NAV DOM ACTIONS MAPPING ---
-            function bindUIEvents() {
-                // View Hot-Swapping Panel Trigger Router Mapping Loop
-                const toolCircles = document.querySelectorAll('.tool-circle');
-                const viewPanels = document.querySelectorAll('.view-panel');
-
-                toolCircles.forEach(circle => {
-                    circle.addEventListener('click', () => {
-                        toolCircles.forEach(c => c.classList.remove('active'));
-                        viewPanels.forEach(p => p.classList.remove('active'));
-
-                        circle.classList.add('active');
-                        const targetView = document.getElementById(`view-${circle.dataset.target}`);
-                        if (targetView) targetView.classList.add('active');
-                    });
-                });
-
-                // Top-left Logo routing structure action rules definition mapping
-                document.getElementById('nav-logo').addEventListener('click', () => {
-                    toolCircles.forEach(c => c.classList.remove('active'));
-                    viewPanels.forEach(p => p.classList.remove('active'));
-                    document.querySelector('[data-target="home"]').classList.add('active');
-                    document.getElementById('view-home').classList.add('active');
-                });
-
-                // Right Sliding Fly-Out Dock Menu Interactions Drawer Trigger Elements Binding
-                const trigger = document.getElementById('tool-selector-trigger');
-                const panel = document.getElementById('tool-menu-panel');
-                
-                trigger.addEventListener('mouseenter', () => panel.classList.add('visible'));
-                panel.addEventListener('mouseleave', () => panel.classList.remove('visible'));
-
-                // Universal Board Drawer Controls Binding Map Rules Context Setup
-                const drawer = document.getElementById('universal-drawer');
-                document.getElementById('universal-board-toggle').addEventListener('click', () => drawer.classList.toggle('open'));
-                document.getElementById('drawer-close').addEventListener('click', () => drawer.classList.remove('open'));
-
-                // Settings Interactivity Management Interface Actions Matrix Mounting Setup
-                const settings = document.getElementById('settings-panel');
-                document.getElementById('settings-toggle').addEventListener('click', () => settings.classList.toggle('open'));
-                document.getElementById('settings-close').addEventListener('click', () => settings.classList.remove('open'));
-
-                // Voice Brain Atom Interaction Panel Expand System Matrix Setup Mapping Rules Logic
-                const voiceAtom = document.getElementById('voice-atom');
-                const voiceDock = document.getElementById('voice-dock');
-                
-                voiceAtom.addEventListener('click', (e) => {
-                    // Prevent workspace background firing if clicked inside drag bounds space
-                    e.stopPropagation();
-                    voiceDock.classList.toggle('open');
-                });
-
-                const dockBtns = document.querySelectorAll('.dock-mode-btn');
-                dockBtns.forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        dockBtns.forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                    });
-                });
-
-                // Horizontal Draggable Mechanics Engine Infrastructure Framework Logic Setups
-                let isDragging = false;
-                let startX = 0;
-
-                voiceAtom.addEventListener('mousedown', (e) => {
-                    isDragging = true;
-                    startX = e.clientX - voiceAtom.getBoundingClientRect().left;
-                    voiceAtom.style.transition = 'none';
-                });
-
-                window.addEventListener('mousemove', (e) => {
-                    if (!isDragging) return;
-                    let targetX = e.clientX - startX;
-                    // Boundary enforcement
-                    if (targetX > 20 && targetX < window.innerWidth - 60) {
-                        document.getElementById('voice-atom-container').style.left = `${targetX}px`;
-                        document.getElementById('voice-atom-container').style.transform = 'none';
-                    }
-                });
-
-                window.addEventListener('mouseup', () => {
-                    isDragging = false;
-                });
-
-                // State Core Data System Backup Actions Logic Routines Integration Hookups Setup
-                document.getElementById('btn-export-state').addEventListener('click', () => {
-                    const jsonBox = document.getElementById('state-json-io');
-                    jsonBox.select();
-                    navigator.clipboard.writeText(jsonBox.value);
-                    alert("State transaction package configuration blueprint copied cleanly directly into application clipboard registry system.");
-                });
-
-                document.getElementById('btn-clear-cache').addEventListener('click', () => {
-                    if(confirm("Are you sure you want to completely flush the local runtime environment memory buffers now? This wipe operation cannot be undone.")) {
-                        localStorage.removeItem(STORAGE_KEY);
-                        window.location.reload();
-                    }
-                });
-            }
-
-            // --- RUNTIME BOOT ENGINE INITIALIZATION EXECUTION RULE SEQUENCE CALLS ---
-            document.addEventListener('DOMContentLoaded', () => {
-                initEngineState();
-                bindUIEvents();
-            });
-
-        })();
-    </script>
+    <script src="js/app.js"></script>
 </body>
 </html>
