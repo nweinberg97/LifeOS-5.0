@@ -1,258 +1,322 @@
 /* ==========================================================================
-   LIFEOS CORE ENGINE - CENTRAL INITIALIZER & STATE ROUTER
+   LIFEOS APPLICATION ARCHITECTURE ENGINE CORE
    ========================================================================== */
 
-// Global App State Repository
 const LifeOS = {
     state: {
         currentView: 'home',
         isNavOpen: false,
-        isUniversalBoardOpen: false,
+        isUniversalOpen: false,
         isChatOpen: false
     },
-    // Primary Data Vault (LocalStorage Mirror)
     cards: JSON.parse(localStorage.getItem('lifeos_cards')) || [],
-    chatHistory: JSON.parse(localStorage.getItem('lifeos_chat')) || []
-};
 
-document.addEventListener('DOMContentLoaded', () => {
-    LifeOS.init();
-});
+    init() {
+        this.clockEngine();
+        this.bindEvents();
+        this.renderAllCanvases();
+        this.renderHomeFeeds();
+    },
 
-LifeOS.init = function() {
-    // 1. Fire up system-wide peripheral engines
-    this.startClockEngine();
-    this.fetchWeather();
-    
-    // 2. Bind application-wide event handlers
-    this.bindGlobalEvents();
-    
-    // 3. Render initial dashboard data streams
-    this.renderHomeDashboard();
-};
-
-/* ==========================================================================
-   1. SYSTEM ENVIRONMENT ENGINES (CLOCK, METRICS)
-   ========================================================================== */
-LifeOS.startClockEngine = function() {
-    const clockEl = document.getElementById('digital-clock');
-    const dateEl = document.getElementById('current-date');
-    
-    const updateTime = () => {
-        const now = new Date();
+    clockEngine() {
+        const clock = document.getElementById('digital-clock');
+        const dateEl = document.getElementById('current-date');
+        const weather = document.getElementById('weather-display');
         
-        // Digital Clock Numbers-Only Minimal Display
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        clockEl.textContent = `${hours}:${minutes}`;
-        
-        // Crisp Date Formatting
-        const options = { weekday: 'short', month: 'short', day: 'numeric' };
-        dateEl.textContent = now.toLocaleDateString('en-US', options);
-    };
-    
-    updateTime();
-    setInterval(updateTime, 1000); // Ticks every second for real-time accuracy
-};
+        const tick = () => {
+            const now = new Date();
+            clock.textContent = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            dateEl.textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        };
+        tick();
+        setInterval(tick, 1000);
+        weather.textContent = "18°C"; 
+    },
 
-LifeOS.fetchWeather = function() {
-    const weatherEl = document.getElementById('weather-display');
-    // Prototype Baseline: Localized fallback data. 
-    // Easily hook up to a free client geolocation API string here.
-    weatherEl.textContent = "21°C"; 
-};
-
-/* ==========================================================================
-   2. CORE ROUTING & UI INTERACTION HANDLERS
-   ========================================================================== */
-LifeOS.bindGlobalEvents = function() {
-    const triangleBtn = document.getElementById('triangle-toggle-btn');
-    const pillMenu = document.getElementById('tool-pill-menu');
-    const universalBtn = document.getElementById('universal-board-btn');
-    const universalDrawer = document.getElementById('universal-board-drawer');
-    const voiceAnchorBtn = document.getElementById('voice-anchor-btn');
-    const chatPanel = document.getElementById('chat-interface-panel');
-    const minimizeChatBtn = document.getElementById('minimize-chat');
-    const trashZone = document.getElementById('global-trash-dropzone');
-
-    // --- Triangle Navigation Switcher Mechanics ---
-    triangleBtn.addEventListener('click', () => {
-        this.state.isNavOpen = !this.state.isNavOpen;
-        triangleBtn.classList.toggle('active', this.state.isNavOpen);
-        pillMenu.classList.toggle('hidden', !this.state.isNavOpen);
-    });
-
-    // Handle View Mutation Switches via Pills
-    document.querySelectorAll('.tool-pill').forEach(pill => {
-        pill.addEventListener('click', (e) => {
-            const targetView = e.target.getAttribute('data-target');
-            this.switchView(targetView);
-            
-            // Re-align pill visual active highlights
-            document.querySelectorAll('.tool-pill').forEach(p => p.classList.remove('active'));
-            e.target.classList.add('active');
-            
-            // Instantly contract navigation ring on selection
-            this.state.isNavOpen = false;
-            triangleBtn.classList.remove('active');
-            pillMenu.classList.add('hidden');
+    bindEvents() {
+        // --- Brand click Home Routing ---
+        document.getElementById('brand-home-trigger').addEventListener('click', () => {
+            this.switchView('home');
         });
-    });
 
-    // --- Universal Board Visibility Trigger ---
-    universalBtn.addEventListener('click', () => {
-        this.state.isUniversalBoardOpen = !this.state.isUniversalBoardOpen;
-        universalDrawer.classList.toggle('hidden', !this.state.isUniversalBoardOpen);
-    });
+        // --- Triangle Toggle Navigation ---
+        const triangleBtn = document.getElementById('triangle-toggle-btn');
+        const pillMenu = document.getElementById('tool-pill-menu');
+        triangleBtn.addEventListener('click', () => {
+            this.state.isNavOpen = !this.state.isNavOpen;
+            triangleBtn.classList.toggle('active', this.state.isNavOpen);
+            pillMenu.classList.toggle('hidden', !this.state.isNavOpen);
+        });
 
-    // --- Persistent Chat Window View Layer Toggle ---
-    voiceAnchorBtn.addEventListener('click', (e) => {
-        // Prevent event firing overlap during mouse click drag cycles
-        if (voiceAnchorBtn.classList.contains('is-dragging')) return;
-        this.state.isChatOpen = !this.state.isChatOpen;
-        chatPanel.classList.toggle('hidden', !this.state.isChatOpen);
-    });
+        // --- Navigation Switcher Routing ---
+        document.querySelectorAll('.tool-pill, .tool-house-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const target = e.currentTarget.getAttribute('data-target');
+                this.switchView(target);
+                
+                document.querySelectorAll('.tool-pill, .tool-house-btn').forEach(b => b.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                
+                // Retract menu immediately upon tool swap routing
+                this.state.isNavOpen = false;
+                triangleBtn.classList.remove('active');
+                pillMenu.classList.add('hidden');
+            });
+        });
 
-    minimizeChatBtn.addEventListener('click', () => {
-        this.state.isChatOpen = false;
-        chatPanel.classList.add('hidden');
-    });
+        // --- Hamburger Settings Pop-out Menu Module ---
+        const settingsTrigger = document.getElementById('settings-trigger');
+        const settingsMenu = document.getElementById('settings-hamburger-menu');
+        settingsTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            settingsMenu.classList.toggle('hidden');
+        });
+        document.addEventListener('click', () => settingsMenu.classList.add('hidden'));
 
-    // --- HTML5 Native Drag & Drop Destruction Engine ---
-    trashZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        trashZone.classList.add('drag-over');
-    });
+        // --- Hamburger Actions Setup ---
+        document.getElementById('setting-download').addEventListener('click', () => this.downloadBackup());
+        document.getElementById('setting-reset').addEventListener('click', () => this.systemReset());
+        document.getElementById('setting-transfer').addEventListener('click', () => {
+            document.getElementById('sync-modal').classList.remove('hidden');
+        });
+        document.getElementById('confirm-sync-btn').addEventListener('click', () => {
+            document.getElementById('sync-modal').classList.add('hidden');
+        });
 
-    trashZone.addEventListener('dragleave', () => {
-        trashZone.classList.remove('drag-over');
-    });
+        // --- Universal Board Visibility Trigger ---
+        document.getElementById('universal-board-btn').addEventListener('click', () => {
+            this.state.isUniversalOpen = !this.state.isUniversalOpen;
+            document.getElementById('universal-board-drawer').classList.toggle('hidden', !this.state.isUniversalOpen);
+        });
 
-    trashZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        trashZone.classList.remove('drag-over');
-        const cardId = e.dataTransfer.getData('text/plain');
-        if (cardId) {
-            this.deleteCard(cardId);
+        // --- Global Creation Buttons Hook ---
+        document.querySelectorAll('.create-card-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tool = e.currentTarget.getAttribute('data-tool');
+                this.createNewBlankCard(tool);
+            });
+        });
+
+        // --- Persistent Chat Window Toggle Layers ---
+        const voiceAnchorBtn = document.getElementById('voice-anchor-btn');
+        const chatPanel = document.getElementById('chat-interface-panel');
+        voiceAnchorBtn.addEventListener('click', () => {
+            if (voiceAnchorBtn.classList.contains('is-dragging')) return;
+            this.state.isChatOpen = !this.state.isChatOpen;
+            chatPanel.classList.toggle('hidden', !this.state.isChatOpen);
+        });
+        document.getElementById('minimize-chat').addEventListener('click', () => {
+            this.state.isChatOpen = false;
+            chatPanel.classList.add('hidden');
+        });
+
+        // --- HTML5 Native Drag & Drop Trash Destruction Mechanics ---
+        const trashZone = document.getElementById('global-trash-dropzone');
+        trashZone.addEventListener('dragover', (e) => { e.preventDefault(); trashZone.classList.add('drag-over'); });
+        trashZone.addEventListener('dragleave', () => trashZone.classList.remove('drag-over'));
+        trashZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            trashZone.classList.remove('drag-over');
+            const cardId = e.dataTransfer.getData('text/plain');
+            if (cardId) this.deleteCard(cardId);
+        });
+
+        this.setupDraggableVoice();
+    },
+
+    switchView(viewName) {
+        const currentActive = document.querySelector('.app-state.active');
+        if (currentActive) currentActive.classList.remove('active');
+        
+        const targetState = document.getElementById(`state-${viewName}`);
+        if (targetState) {
+            targetState.classList.add('active');
+            this.state.currentView = viewName;
         }
-    });
+        
+        // Sync active highlighting states manually on root triggers
+        document.querySelectorAll('.tool-pill, .tool-house-btn').forEach(b => {
+            b.classList.toggle('active', b.getAttribute('data-target') === viewName);
+        });
+    },
 
-    // Setup voice module dragging hook
-    this.setupDraggableVoiceWidget();
-};
+    createNewBlankCard(sourceTool) {
+        const newCard = {
+            id: 'card_' + Date.now(),
+            type: sourceTool === 'Boardly' ? 'goal' : 'task', // Fallback defaults
+            content: '',
+            source: sourceTool,
+            status: 'active',
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+        };
+        this.cards.push(newCard);
+        this.saveStateToStorage();
+        this.renderAllCanvases();
+        this.renderHomeFeeds();
+    },
 
-LifeOS.switchView = function(viewName) {
-    // Hide previous state panel
-    const currentActiveState = document.querySelector('.app-state.active');
-    if (currentActiveState) currentActiveState.classList.remove('active');
+    deleteCard(id) {
+        this.cards = this.cards.filter(c => c.id !== id);
+        this.saveStateToStorage();
+        this.renderAllCanvases();
+        this.renderHomeFeeds();
+    },
 
-    // Activate selected target state backdrop layout
-    const targetState = document.getElementById(`state-${viewName}`);
-    if (targetState) {
-        targetState.classList.add('active');
-        this.state.currentView = viewName;
-    }
-};
+    saveStateToStorage() {
+        localStorage.setItem('lifeos_cards', JSON.stringify(this.cards));
+    },
 
-/* ==========================================================================
-   3. DATA MUTATION LAYERS & PERSISTENCE
-   ========================================================================== */
-LifeOS.renderHomeDashboard = function() {
-    const nextUpList = document.getElementById('next-up-list');
-    const recentUpdatesList = document.getElementById('recent-updates-list');
-    
-    // Clear out container viewports
-    nextUpList.innerHTML = '';
-    recentUpdatesList.innerHTML = '';
+    renderAllCanvases() {
+        const tools = ['Taskly', 'Boardly', 'Timely', 'Brainly', 'Universal'];
+        tools.forEach(tool => {
+            const canvas = document.getElementById(`${tool.toLowerCase()}-canvas`) || document.getElementById('universal-card-scroller');
+            if (!canvas) return;
+            canvas.innerHTML = '';
+            
+            const toolCards = this.cards.filter(c => c.source === tool || (tool === 'Universal' && c.source === 'Universal'));
+            toolCards.forEach(card => {
+                const widget = this.buildCardUIElement(card);
+                canvas.appendChild(widget);
+            });
+        });
+    },
 
-    // Filter down to the exactly 3 high-priority urgent slots
-    const activeCards = this.cards.filter(c => c.status === 'active');
-    const nextUpCards = activeCards.slice(0, 3);
+    buildCardUIElement(card) {
+        const widget = document.createElement('div');
+        widget.className = `universal-card-widget type-${card.type}`;
+        widget.draggable = true;
+        
+        const txt = document.createElement('textarea');
+        txt.className = 'card-editable-area';
+        txt.placeholder = 'Type entry content...';
+        txt.value = card.content;
+        
+        txt.addEventListener('input', (e) => {
+            card.content = e.target.value;
+            card.updatedAt = Date.now();
+            LifeOS.saveStateToStorage();
+            LifeOS.renderHomeFeeds();
+        });
 
-    if (nextUpCards.length === 0) {
-        nextUpList.innerHTML = `<div class="empty-state-notice">System state clear. No upcoming tasks.</div>`;
-    } else {
-        nextUpCards.forEach(card => {
-            const cardEl = this.createMinimalFeedItem(card);
-            nextUpList.appendChild(cardEl);
+        widget.appendChild(txt);
+
+        // Control strip layer 
+        const controlRow = document.createElement('div');
+        controlRow.className = 'card-control-row';
+        
+        // Multi-state design tokens cycler specific to Boardly
+        if (card.source === 'Boardly') {
+            const cycler = document.createElement('button');
+            cycler.className = 'card-cycle-btn';
+            
+            const renderCycleLabel = (type) => {
+                if (type === 'goal') return '🎯 Goal';
+                if (type === 'note') return '✏️ Note';
+                return '✅ Task';
+            };
+            
+            cycler.textContent = renderCycleLabel(card.type);
+            cycler.addEventListener('click', () => {
+                if (card.type === 'goal') card.type = 'note';
+                else if (card.type === 'note') card.type = 'task';
+                else card.type = 'goal';
+                
+                widget.className = `universal-card-widget type-${card.type}`;
+                cycler.textContent = renderCycleLabel(card.type);
+                LifeOS.saveStateToStorage();
+            });
+            controlRow.appendChild(cycler);
+        }
+
+        widget.appendChild(controlRow);
+
+        widget.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', card.id);
+        });
+
+        return widget;
+    },
+
+    renderHomeFeeds() {
+        const nextUp = document.getElementById('next-up-list');
+        const recent = document.getElementById('recent-updates-list');
+        if (!nextUp || !recent) return;
+
+        nextUp.innerHTML = ''; recent.innerHTML = '';
+
+        const active = this.cards.filter(c => c.content.trim() !== '');
+        const topThree = active.slice(0, 3);
+        
+        if (topThree.length === 0) {
+            nextUp.innerHTML = '<div style="font-size:13px; color:rgba(255,255,255,0.6)">Workspace empty. Create a card inside your tools.</div>';
+        } else {
+            topThree.forEach(c => {
+                const item = document.createElement('div');
+                item.style.padding = '10px'; item.style.background = 'rgba(255,255,255,0.1)'; item.style.borderRadius = '8px';
+                item.style.fontSize = '13px';
+                item.innerHTML = `<strong>[${c.source}]</strong> ${c.content.substring(0,60)}`;
+                nextUp.appendChild(item);
+            });
+        }
+
+        const updates = [...this.cards].sort((a,b) => b.updatedAt - a.updatedAt).slice(0, 5);
+        if (updates.length === 0) {
+            recent.innerHTML = '<div style="font-size:13px; color:rgba(255,255,255,0.6)">No logged events.</div>';
+        } else {
+            updates.forEach(c => {
+                const item = document.createElement('div');
+                item.style.fontSize = '12px'; item.style.opacity = '0.85';
+                item.innerHTML = `Updated data element in <strong>${c.source}</strong>`;
+                recent.appendChild(item);
+            });
+        }
+    },
+
+    downloadBackup() {
+        const blob = new Blob([JSON.stringify(this.cards, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'lifeos_system_backup.json';
+        a.click();
+    },
+
+    systemReset() {
+        if(confirm("Confirm hard storage wipe? All local state logs will be deleted.")) {
+            localStorage.clear();
+            location.reload();
+        }
+    },
+
+    setupDraggableVoice() {
+        const widget = document.getElementById('voice-cognitive-shell');
+        const trigger = document.getElementById('voice-anchor-btn');
+        let isDragging = false;
+        let startX, startY, initialX, initialY;
+
+        trigger.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            trigger.classList.remove('is-dragging');
+            startX = e.clientX; startY = e.clientY;
+            const rect = widget.getBoundingClientRect();
+            initialX = rect.left; initialY = rect.top;
+            widget.style.left = initialX + 'px';
+            widget.style.bottom = 'auto'; widget.style.top = initialY + 'px'; widget.style.transform = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            trigger.classList.add('is-dragging');
+            widget.style.left = (initialX + (e.clientX - startX)) + 'px';
+            widget.style.top = (initialY + (e.clientY - startY)) + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (!isDragging) return;
+            setTimeout(() => { trigger.classList.remove('is-dragging'); }, 50);
+            isDragging = false;
         });
     }
-
-    // Pull recent additions array elements
-    const recentCards = [...this.cards].sort((a,b) => b.createdAt - a.createdAt).slice(0, 5);
-    if (recentCards.length === 0) {
-        recentUpdatesList.innerHTML = `<div class="empty-state-notice">No updates recorded in database.</div>`;
-    } else {
-        recentCards.forEach(card => {
-            const updateItem = document.createElement('div');
-            updateItem.className = 'update-feed-row';
-            updateItem.innerHTML = `<strong>${card.source}</strong>: ${card.content.substring(0, 35)}...`;
-            recentUpdatesList.appendChild(updateItem);
-        });
-    }
 };
 
-LifeOS.createMinimalFeedItem = function(card) {
-    const el = document.createElement('div');
-    el.className = 'feed-card-item';
-    el.draggable = true;
-    el.setAttribute('data-id', card.id);
-    el.innerHTML = `<span>${card.content}</span><small class="tag-${card.type}">${card.type}</small>`;
-    
-    el.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('text/plain', card.id);
-    });
-    
-    return el;
-};
-
-LifeOS.deleteCard = function(id) {
-    this.cards = this.cards.filter(c => c.id !== id);
-    localStorage.setItem('lifeos_cards', JSON.stringify(this.cards));
-    
-    // Trigger real-time visual system state updates
-    this.renderHomeDashboard();
-};
-
-/* ==========================================================================
-   4. PERIPHERAL ACCELERATION HOOKS (DRAG RIGS)
-   ========================================================================== */
-LifeOS.setupDraggableVoiceWidget = function() {
-    const widget = document.getElementById('voice-cognitive-shell');
-    const trigger = document.getElementById('voice-anchor-btn');
-    let isDragging = false;
-    let startX, startY, initialX, initialY;
-
-    trigger.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        trigger.classList.remove('is-dragging');
-        startX = e.clientX;
-        startY = e.clientY;
-        
-        const rect = widget.getBoundingClientRect();
-        initialX = rect.left;
-        initialY = rect.top;
-        
-        // Temporarily clear centered positioning rules
-        widget.style.left = initialX + 'px';
-        widget.style.bottom = 'auto';
-        widget.style.top = initialY + 'px';
-        widget.style.transform = 'none';
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isDragging) return;
-        trigger.classList.add('is-dragging');
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        
-        widget.style.left = (initialX + dx) + 'px';
-        widget.style.top = (initialY + dy) + 'px';
-    });
-
-    document.addEventListener('mouseup', () => {
-        if (!isDragging) return;
-        setTimeout(() => { trigger.classList.remove('is-dragging'); }, 50);
-        isDragging = false;
-    });
-};
+document.addEventListener('DOMContentLoaded', () => LifeOS.init());
