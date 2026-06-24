@@ -1,208 +1,222 @@
 /* ==========================================================================
-   SYSTEM DESIGN TOKENS & RESET
+   SYSTEM CORE TOKENS & RESET
    ========================================================================== */
 :root {
     --bg-primary: #FFFFFF;
     --bg-secondary: #FAFAFA;
     --border-color: #EAEAEA;
     --text-primary: #111111;
-    --text-muted: #717171;
+    --text-muted: #8E8E93;
     --accent-black: #000000;
-    --accent-pill-hover: #F5F5F7;
-    --danger-red: #FF4D4F;
-    --danger-bg: #FFF5F5;
-    
-    --layer-base: 1;
+    --danger-red: #FF3B30;
+    --danger-bg: #FFECEB;
     --layer-ui: 100;
     --layer-panel: 500;
     --layer-floating: 1000;
-    
     --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
     overflow: hidden;
     width: 100vw;
     height: 100vh;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* ==========================================================================
-   TOP NAVIGATION & HAMBURGER SYSTEM
+   TOP STICKY NAVIGATION BAR
    ========================================================================== */
 .top-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 40px;
-    border-bottom: 1px solid var(--border-color);
-    background-color: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px);
-    z-index: var(--layer-ui);
+    position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+    display: flex; justify-content: space-between; align-items: center; padding: 0 40px;
+    border-bottom: 1px solid var(--border-color); background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px); z-index: var(--layer-ui);
 }
 
-.brand-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-}
+.brand-wrapper { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+.atom-logo { color: var(--accent-black); animation: clean-spin 30s linear infinite; }
+@keyframes clean-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.logo { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
 
-.atom-logo {
-    color: var(--accent-black);
-    animation: slow-spin 20s linear infinite;
-}
-
-@keyframes slow-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-.logo { font-size: 18px; font-weight: 600; letter-spacing: -0.4px; }
-
-.nav-right { position: relative; }
-
+.nav-right { position: relative; display: flex; align-items: center; }
 .icon-btn {
     background: none; border: none; cursor: pointer; color: var(--text-primary);
-    display: flex; align-items: center; justify-content: center;
-    width: 36px; height: 36px; border-radius: 50%; transition: background 0.2s;
+    width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
 }
 .icon-btn:hover { background-color: var(--bg-secondary); }
 
-/* Settings Hamburger Panel Dropdown */
+/* Hamburger Dropdown Structural Sheet */
 .hamburger-dropdown {
-    position: absolute;
-    top: 42px;
-    right: 0;
-    width: 220px;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    padding: 6px;
-    z-index: var(--layer-floating);
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+    position: absolute; top: 46px; right: 0; width: 240px;
+    background: var(--bg-primary); border: 1px solid var(--border-color);
+    border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.08); padding: 6px;
+    z-index: var(--layer-floating); display: flex; flex-direction: column; gap: 2px;
 }
 .hamburger-dropdown.hidden { display: none; }
-
 .hamburger-item {
     background: none; border: none; text-align: left; padding: 10px 14px;
     font-size: 13px; font-weight: 500; border-radius: 8px; cursor: pointer;
     color: var(--text-primary); transition: background 0.2s;
 }
-.hamburger-item:hover { background-color: var(--accent-pill-hover); }
+.hamburger-item:hover { background-color: var(--bg-secondary); }
 
 /* ==========================================================================
-   HOME VIEWPORT & LOCAL FROSTED COGNITIVE VISUALS
+   ALIGNED UNIVERSAL CONTAINER SYSTEM (TOP RIGHT, SEPARATED FROM NAV)
+   ========================================================================== */
+.top-right-alignment {
+    position: fixed; top: 76px; right: 40px; z-index: var(--layer-ui);
+    display: flex; flex-direction: column; align-items: flex-end;
+}
+.universal-btn {
+    background: none; border: none; cursor: pointer; border-radius: 50%;
+    transition: transform 0.2s var(--transition-smooth); width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+}
+.universal-btn:hover { transform: scale(1.06); }
+
+.universal-container {
+    margin-top: 14px; width: 340px; height: 440px; background: var(--bg-primary);
+    border: 1px solid var(--border-color); border-radius: 16px;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden;
+}
+.universal-container.hidden { display: none; }
+.drawer-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border-color);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.drawer-header h3 { font-size: 14px; font-weight: 600; }
+.scrollable-card-vault { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+/* ==========================================================================
+   HOMEPAGE METRICS & TURQUOISE AMBIENT SKY CANVAS
    ========================================================================== */
 #app-viewport { position: relative; width: 100%; height: 100%; padding-top: 60px; }
-
 .app-state {
     position: absolute; top: 60px; left: 0; width: 100%; height: calc(100% - 60px);
     opacity: 0; visibility: hidden; pointer-events: none;
-    transition: opacity 0.3s var(--transition-smooth), transform 0.3s var(--transition-smooth);
-    transform: translateY(8px);
+    transition: opacity 0.4s var(--transition-smooth), transform 0.4s var(--transition-smooth);
+    transform: translateY(10px);
 }
 .app-state.active { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
 
-/* Ocean Depth Foyer Setup */
 #state-home { display: flex; flex-direction: column; align-items: center; padding: 80px 40px; overflow-y: auto; }
 
-.vancouver-ocean-backdrop {
+/* Premium Tech-Savvy Flowing Color Sky Canvas */
+.vancouver-tech-sky {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(180deg, #E0F2F1 0%, #FFFFFF 100%);
-    opacity: 0.6; z-index: -1;
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    background-size: 400% 400%; animation: fluidSky 25s ease infinite; z-index: -1;
+}
+@keyframes fluidSky {
+    0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
 }
 
-.hero-clock-section { text-align: center; margin-bottom: 60px; }
-
-/* Apple Liquid Frosted Structural Typography Engine */
+/* Apple Liquid Frosted Typography Frame */
 .liquid-glass-text {
-    font-size: 110px; font-weight: 100; letter-spacing: -3px; line-height: 1; margin-bottom: 12px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 100%);
+    font-size: 116px; font-weight: 100; letter-spacing: -4px; line-height: 1; margin-bottom: 14px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.4) 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0px 4px 12px rgba(255,255,255,0.3));
+    filter: drop-shadow(0 4px 20px rgba(0,0,0,0.15));
 }
+.hero-clock-section { text-align: center; margin-bottom: 60px; }
+.hero-meta { font-size: 15px; color: rgba(255,255,255,0.7); font-weight: 500; letter-spacing: -0.1px; }
+.meta-divider { margin: 0 10px; color: rgba(255,255,255,0.4); }
 
-.hero-meta { font-size: 15px; color: var(--text-muted); font-weight: 500; }
-.meta-divider { margin: 0 8px; }
-
-.home-grid { display: grid; grid-template-columns: repeat(2, 440px); gap: 40px; justify-content: center; width: 100%; }
-.dashboard-card-panel { background-color: rgba(250,250,250,0.75); backdrop-filter: blur(10px); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; min-height: 280px; }
-
-/* Generic Global Create Card Button UI Component */
-.tool-header { display: flex; justify-content: space-between; align-items: center; padding: 40px; border-bottom: 1px solid var(--border-color); }
-.global-create-card-btn {
-    background: var(--accent-black); color: #FFF; border: none; font-size: 20px;
-    width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; transition: transform 0.2s;
-}
-.global-create-card-btn:hover { transform: scale(1.1); }
+.home-grid { display: grid; grid-template-columns: repeat(2, 450px); gap: 40px; justify-content: center; width: 100%; }
+.dashboard-card-panel { background: rgba(255,255,255,0.08); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 24px; min-height: 300px; color: #FFFFFF; }
+.dashboard-card-panel h2 { font-size: 16px; font-weight: 600; color: #FFFFFF; }
+.panel-badge { font-size: 11px; background: rgba(255,255,255,0.2); color: #FFF; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
+.card-feed-list { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
 
 /* ==========================================================================
-   SPATIAL RE-ANCHORING INTERFACES
+   FAR RIGHT EXTENSION NAVIGATION HUB (LEFTWARD SLIDE VERTICAL PACK)
    ========================================================================== */
-
-/* 1. Triangle Toggle Shifted to Far Right Edge Centered Vertically */
 .edge-right-centered {
-    position: fixed; right: 20px; top: 50%; transform: translateY(-50%);
-    z-index: var(--layer-floating); display: flex; flex-direction: row-reverse; align-items: center; gap: 14px;
+    position: fixed; right: 24px; top: 50%; transform: translateY(-50%);
+    z-index: var(--layer-floating); display: flex; align-items: center; gap: 16px;
 }
-
 .triangle-btn { background: none; border: none; cursor: pointer; width: 24px; height: 32px; display: flex; align-items: center; justify-content: center; }
 .triangle-icon {
     width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent;
-    border-right: 12px solid var(--accent-black); border-radius: 4px;
-    transition: transform 0.4s var(--transition-smooth); transform: rotate(0deg); /* Points Left/Inward */
+    border-right: 12px solid var(--text-muted); transition: transform 0.4s var(--transition-smooth), border-right-color 0.2s;
 }
-.triangle-btn.active .triangle-icon { transform: rotate(180deg); } /* Points Right/Outward */
+.triangle-btn:hover .triangle-icon { border-right-color: var(--accent-black); }
+.triangle-btn.active .triangle-icon { transform: rotate(180deg); } /* Rotates outward right */
 
+/* Vertical Alignment Menu Sliding Out to the Left of the Triangle Trigger */
 .pill-menu {
-    display: flex; gap: 6px; background-color: var(--bg-primary); padding: 6px;
-    border-radius: 30px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    display: flex; flex-direction: column; gap: 8px; background-color: var(--bg-primary); padding: 8px;
+    border-radius: 20px; border: 1px solid var(--border-color); box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+    align-items: center; transition: opacity 0.3s var(--transition-smooth), transform 0.3s var(--transition-smooth);
 }
-.pill-menu.hidden { display: none; }
+.pill-menu.hidden { opacity: 0; transform: translateX(15px); pointer-events: none; }
 
-.tool-pill { background: none; border: none; padding: 8px 16px; font-size: 13px; font-weight: 500; border-radius: 20px; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
-.tool-pill:hover { background-color: var(--accent-pill-hover); color: var(--text-primary); }
-.tool-pill.active { background-color: var(--accent-black); color: #FFFFFF; }
+.tool-pill {
+    background: none; border: none; padding: 8px 16px; font-size: 13px; font-weight: 600;
+    border-radius: 12px; cursor: pointer; color: var(--text-muted); transition: all 0.2s; width: 84px; text-align: center;
+}
+.tool-pill:hover, .tool-pill.active { background-color: var(--bg-secondary); color: var(--accent-black); }
 
-/* Home icon style adjustment */
+/* Unified Center-Menu Structural House Icon Control */
 .tool-house-btn {
-    background: none; border: none; display: flex; align-items: center; justify-content: center;
-    padding: 0 12px; color: var(--text-muted); cursor: pointer; transition: color 0.2s;
+    background: none; border: none; width: 36px; height: 36px; display: flex; align-items: center;
+    justify-content: center; color: var(--text-muted); cursor: pointer; border-radius: 12px; transition: all 0.2s;
 }
-.tool-house-btn:hover, .tool-house-btn.active { color: var(--accent-black); }
-
-/* 2. Universal Board Container Shifted to Top Right Under Nav */
-.top-right-under-nav { position: fixed; top: 72px; right: 40px; z-index: var(--layer-floating); display: flex; flex-direction: column; align-items: flex-end; }
-.universal-btn { background: none; border: none; cursor: pointer; color: var(--accent-black); }
-.universal-container {
-    margin-top: 10px; width: 320px; height: 420px; background: var(--bg-primary);
-    border: 1px solid var(--border-color); border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.08);
-    display: flex; flex-direction: column; overflow: hidden;
-}
-.universal-container.hidden { display: none; }
-.drawer-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
-.scrollable-card-vault { flex: 1; overflow-y: auto; padding: 16px; }
+.tool-house-btn:hover, .tool-house-btn.active { color: var(--accent-black); background-color: var(--bg-secondary); }
 
 /* ==========================================================================
-   VOICE HUB & EXPANDED HIGH VIS TRASH BIN
+   DYNAMIC UNIVERSAL CARD OBJECT LAYER & INTERFACE ENGINES
+   ========================================================================== */
+.tool-header { display: flex; justify-content: space-between; align-items: center; padding: 40px 60px; border-bottom: 1px solid var(--border-color); }
+.tool-header h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+
+.create-card-btn {
+    background: var(--accent-black); color: #FFFFFF; border: none; font-size: 18px; font-weight: 500;
+    width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: transform 0.2s;
+}
+.create-card-btn:hover { transform: scale(1.08); }
+
+.tool-canvas { padding: 40px 60px; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+
+/* Functional Interactive Workspace Card UI */
+.universal-card-widget {
+    background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 14px;
+    padding: 16px; display: flex; flex-direction: column; gap: 12px; position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: box-shadow 0.2s, transform 0.2s;
+}
+.universal-card-widget:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.05); }
+
+.card-editable-area {
+    width: 100%; border: none; outline: none; resize: none; font-size: 14px;
+    font-family: inherit; color: var(--text-primary); line-height: 1.4; background: transparent;
+}
+
+/* Boardly Multi-State Hue Indicators */
+.universal-card-widget.type-goal { border-left: 4px solid #FF9500; }
+.universal-card-widget.type-note { border-left: 4px solid #007AFF; }
+.universal-card-widget.type-task { border-left: 4px solid #34C759; }
+
+.card-control-row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+.card-cycle-btn {
+    background: var(--bg-secondary); border: 1px solid var(--border-color); font-size: 11px;
+    font-weight: 600; padding: 4px 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px;
+}
+
+/* ==========================================================================
+   VOICE COGNITIVE RIG & DANGER-RED HIGH TRASH
    ========================================================================== */
 .draggable-voice-widget { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: var(--layer-floating); display: flex; flex-direction: column; align-items: center; }
 .voice-bubble-trigger {
     width: 56px; height: 56px; border-radius: 50%; background-color: var(--accent-black);
     border: none; cursor: grab; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
-.voice-atom-logo { width: 26px; height: 26px; animation: slow-spin 25s linear infinite; }
+.voice-atom-logo { width: 24px; height: 24px; animation: clean-spin 40s linear infinite; }
 .chat-panel { position: absolute; bottom: 72px; width: 380px; height: 480px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 16px 48px rgba(0,0,0,0.12); display: flex; flex-direction: column; overflow: hidden; }
 .chat-panel.hidden { display: none; }
 .chat-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; }
@@ -210,17 +224,24 @@ body {
 .chat-input-bar { padding: 16px; border-top: 1px solid var(--border-color); display: flex; gap: 10px; align-items: center; }
 #assistant-raw-input { flex: 1; border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 20px; outline: none; font-size: 14px; }
 
-/* High-Signaling Danger Red Expansion Destruction Zone */
+.mode-action-btn { background: none; border: none; font-size: 16px; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.mode-action-btn:hover { background-color: var(--bg-secondary); }
+
+/* High-Signaling Danger Red Expansion Zone */
 .trash-zone {
-    position: fixed; bottom: 40px; right: 40px; width: 56px; height: 56px; border-radius: 50%;
-    border: 2px dashed var(--danger-red); background-color: rgba(255,77,79,0.03);
+    position: fixed; bottom: 40px; right: 40px; width: 58px; height: 58px; border-radius: 50%;
+    border: 2px dashed var(--danger-red); background-color: rgba(255,59,48,0.02);
     display: flex; align-items: center; justify-content: center; color: var(--danger-red);
-    transition: all 0.3s var(--transition-smooth); z-index: var(--layer-ui);
+    transition: all 0.25s var(--transition-smooth); z-index: var(--layer-ui);
 }
-.trash-zone:hover {
-    transform: scale(1.18); background-color: var(--danger-bg);
-    box-shadow: 0 8px 24px rgba(255,77,79,0.15);
-}
-.trash-zone.drag-over {
-    background-color: var(--danger-red); color: #FFFFFF; border-style: solid; transform: scale(1.25);
-}
+.trash-zone:hover { transform: scale(1.15); background-color: var(--danger-bg); box-shadow: 0 8px 24px rgba(255,59,48,0.12); }
+.trash-zone.drag-over { background-color: var(--danger-red); color: #FFFFFF; border-style: solid; transform: scale(1.22); }
+
+/* LOCAL DEVICE DEVICE HANDSHAKE MODAL */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.3); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: var(--layer-floating); }
+.modal-overlay.hidden { display: none; }
+.modal-sheet { background: var(--bg-primary); padding: 30px; border-radius: 16px; max-width: 400px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.15); }
+.modal-sheet h3 { margin-bottom: 12px; font-size: 18px; }
+.modal-sheet p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; }
+.modal-sheet input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: monospace; font-size: 15px; text-align: center; margin-bottom: 20px; background: var(--bg-secondary); }
+.modal-close-btn { background: var(--accent-black); color: #FFF; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; }
